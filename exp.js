@@ -8,7 +8,7 @@ const userList = document.getElementById('itemList');
 
 my_form.addEventListener('submit', onsubmit)
 
-function onsubmit(e) {
+async function onsubmit(e) {
     e.preventDefault();
     const name = nameInput.value;
     const emailId = emailInput.value;
@@ -24,26 +24,34 @@ function onsubmit(e) {
         amount: amount,
         description: description
     }
-    axios.post("https://crudcrud.com/api/1e19ff724af64bc69f7a1f0127f4cec5/usersDetails", usersDetails)
-        .then((response) => {
-            console.log(response)
-            showOnScreen(usersDetails)
-        })
-        .catch((err) => console.log(err))
+    try {
+        const response = await axios.post("https://crudcrud.com/api/eddb2e78ae4f4a5f8ad2cc580a5b1eaa/usersDetails", usersDetails)
 
+        const data = await showOnScreen(response.data)
+
+    }
+    catch (error) {
+        console.log(error)
+
+    }
+}
+
+async function event() {
+
+    try {
+        const response = await axios.get("https://crudcrud.com/api/eddb2e78ae4f4a5f8ad2cc580a5b1eaa/usersDetails")
+
+        for (let i = 0; i < response.data.length; i++) {
+
+            const data = await showOnScreen(response.data[i])
+        }
+
+    }
+    catch (err) {
+        console.log(err)
+    }
 
 }
-window.addEventListener('DOMContentLoaded', () => {
-    axios.get("https://crudcrud.com/api/1e19ff724af64bc69f7a1f0127f4cec5/usersDetails")
-        .then((response) => {
-            console.log(response)
-            for (let i = 0; i < response.data.length; i++) {
-
-                showOnScreen(response.data[i])
-            }
-        })
-        .catch(err => console.log(err))
-})
 
 
 
@@ -82,13 +90,16 @@ function editUser(name, email, amount, userId) {
 }
 
 // delete user
-function deleteUser(userId) {
-    axios.delete(`https://crudcrud.com/api/1e19ff724af64bc69f7a1f0127f4cec5/usersDetails/${userId}`)
-        .then((response) => {
-            console.log(response)
-            removeFromScreen(userId)
-        })
-        .catch(err => console.log(err))
+async function deleteUser(userId) {
+    try {
+        const response = await axios.delete(`https://crudcrud.com/api/eddb2e78ae4f4a5f8ad2cc580a5b1eaa/usersDetails/${userId}`)
+
+        const data = await removeFromScreen(userId)
+
+    }
+    catch (err) {
+        console.log(err)
+    }
 }
 
 // remove from the screen

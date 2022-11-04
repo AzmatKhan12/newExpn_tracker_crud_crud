@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <form onsubmit="saveToServer(event)">
+        <label> choose expenseamount</label>
+        <input id='ea' type="text" name="expenseamount" required />
+        <label>choose description</label>
+
+        <input id='des' type="text" name="description" required />
+
+        <label> choose category</label>
+        <input id='cat' type="text" name="category" required />
+
+        <select id="option">
+            <option value="food">food</option>
+            <option value="movie">movie</option>
+            <option value="hotel">hotel</option>
+            <option value="travelling">travelling</option>
+        </select>
+        <button> Submit </button>
+    </form>
+    <ul id='listOfUsers'></ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+    <script>
+        async function saveToServer(event) {
+            event.preventDefault();
+            const expenseamount = event.target.ea.value;
+            const description = event.target.des.value;
+            const category = event.target.cat.value;
+
+            const obj = {
+                expenseamount,
+                description,
+                category
+            }
+            try {
+                const response = await axios.post("https://crudcrud.com/api/81bd1a10dda249208b4a4c215bf4cb10/expenseTracker1", obj)
+                const data = await showNewUserOnScreen(response.data)
+            }
+            catch (error) {
+                console.log(err)
+            }
+
+        }
+
+        async function event() {
+
+            try {
+                const response = await axios.get("https://crudcrud.com/api/81bd1a10dda249208b4a4c215bf4cb10/expenseTracker1")
+                for (var i = 0; i < response.data.length; i++) {
+                    const data = await showNewUserOnScreen(response.data[i])
+                }
+            }
+            catch (error) {
+                console.log(error)
+            }
+        }
+
+        function showNewUserOnScreen(user) {
+            document.getElementById('ea').value = '';
+            document.getElementById('des').value = '';
+            document.getElementById('cat').value = '';
+
+            if (localStorage.getItem(user.description) !== null) {
+                removeUserFromScreen(user.description)
+            }
+            const parentNode = document.getElementById('listOfUsers');
+            const childHTML = `<li id=${user._id}> ${user.expenseamount} - ${user.description} - ${user.category}
+                                    <button onclick=deleteUser('${user._id}')> Delete User </button>
+                                    <button onclick=editUserDetails('${user._id}','${user.expenseamount}','${user.category}','${user.description}')>Edit User </button>
+                                 </li>`
+            parentNode.innerHTML = parentNode.innerHTML + childHTML;
+        }
+        //Edit User
+        function editUserDetails(descript, expense, categ) {
+            document.getElementById('des').value = descript;
+            document.getElementById('ea').value = expense;
+            document.getElementById('cat').value = categ;
+            deleteUser(descript)
+        }
+
+        async function deleteUser(userId) {
+            try {
+                const response = await axios.delete(`https://crudcrud.com/api/81bd1a10dda249208b4a4c215bf4cb10/expenseTracker1/${userId}`)
+                const data = await removeUserFromScreen(userId)
+            }
+
+            catch (error) {
+                console.log(error)
+            }
+
+        }
+        function removeUserFromScreen(userId) {
+            const parentNode = document.getElementById('listOfUsers');
+            const childNodeToBeDeleted = document.getElementById(userId);
+            if (childNodeToBeDeleted) {
+                parentNode.removeChild(childNodeToBeDeleted)
+            }
+        }
+    </script>
+</body>
+
+</html>
